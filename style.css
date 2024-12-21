@@ -1,0 +1,118 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-size: 24px;
+    background-color: #333;
+}
+
+.calculator {
+    margin:  100px auto;
+    max-width: 300px;
+}
+
+.display {
+    background-color: black;
+    color: white;
+    min-height: 75px;
+    font-size: 2.5rem;
+    text-align: end;
+    padding: 8px;
+}
+
+.buttons {
+    display: grid;
+    grid-template-areas: 
+        "clear clear back-space divide"
+        "seven eight nine multiplication"
+        "four five six minus"
+        "one two three plus"
+        "nil nil period equals";
+}
+
+button {
+    background-color: #ccc;
+    color: black;
+    min-height: 60px;
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.operator {
+    background-color: orange;
+    color: white;
+}
+
+.clear {
+    grid-area: clear;
+}
+
+.back-space {
+    grid-area: back-space;
+}
+
+.divide {
+    grid-area: divide;
+}
+
+.seven {
+    grid-area: seven;
+}
+
+.eight {
+    grid-area: eight;
+}
+
+.nine {
+    grid-area: nine;
+}
+
+.multiply {
+    grid-area: multiplication;
+}
+
+.four {
+    grid-area: four;
+}
+
+.five {
+    grid-area: five;
+}
+
+.six {
+    grid-area: six;
+}
+
+.subtract {
+    grid-area: minus;
+}
+
+.one {
+    grid-area: one;
+}
+
+.two {
+    grid-area: two;
+}
+
+.three {
+    grid-area: three;
+}
+
+.add {
+    grid-area: plus;
+}
+
+.zero {
+    grid-area: nil;
+}
+
+.decimal {
+    grid-area: period;
+}
+
+.equals {
+    grid-area: equals;
+}
+
