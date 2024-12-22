@@ -11,101 +11,98 @@ const calculator = {
     }
 };
 
-// Selectors
-const display = document.querySelector('.display');
-const clearBtn = document.querySelector('.clear');
-const backSpaceBtn = document.querySelector('.back-space');
-const divideBtn = document.querySelector('.divide');
-const sevenBtn = document.querySelector('.seven');
-const eightBtn = document.querySelector('.eight');
-const nineBtn = document.querySelector('.nine');
-const multiplyBtn = document.querySelector('.multiply');
-const fourBtn = document.querySelector('.four');
-const fiveBtn = document.querySelector('.five');
-const sixBtn = document.querySelector('.six');
-const subtractBtn = document.querySelector('.subtract');
-const oneBtn = document.querySelector('.one');
-const twoBtn = document.querySelector('.two');
-const threeBtn = document.querySelector('.three');
-const addBtn = document.querySelector('.add');
-const zeroBtn = document.querySelector('.zero');
-const decimalBtn = document.querySelector('.decimal');
-const equalsBtn = document.querySelector('.equals');
-
-// Used later to create event listeners with loop
-const numberButtons = [oneBtn, twoBtn, threeBtn, fourBtn, fiveBtn, sixBtn, sevenBtn, eightBtn, nineBtn, zeroBtn, decimalBtn];
-const operatorButtons = [addBtn, subtractBtn, divideBtn, multiplyBtn];
-
-// memory
+// Set initial memory
 let currentInput = '';
 let previousInput = '';
 let operatorMode = '';
 
-function handleNumberButtonPress(event) {
-    currentInput = currentInput + event.target.value;
-    display.innerText = currentInput;
-}
-
-function handleOperatorButtonPress(event) {
-    // prevents NaN from multiple clicks on operator
-    if (currentInput !== '') {
-        previousInput = parseFloat(currentInput);
-        currentInput = '';
-        operatorMode = event.target.value;
-    }
-}
-
-function calculateResult() {
-    // prevents NaN from just pressing '='
-    if (currentInput !== '') {
-        currentInput = parseFloat(currentInput);
-        let result;
-
-        if (operatorMode === '+') {
-            result = previousInput + currentInput;
-        } else if (operatorMode === '-') {
-            result = previousInput - currentInput;
-        } else if (operatorMode === '*') {
-            result = previousInput * currentInput;
-        } else if (operatorMode === '/') {
-            result = previousInput / currentInput;
-        } else {
-            result = currentInput;
-        }
-
-        display.innerText = parseFloat(result.toFixed(10));
-        previousInput = result;
-    }
-    
-}
-
-function clearFunction() {
+function reset() {
     currentInput = '';
     previousInput = '';
     operatorMode = '';
-    display.innerText = '0';
+    updateDisplay('0');
 }
 
-function backSpaceFunction() {
+function updateDisplay(value) {
+    calculator.display.innerText = value;
+}
+
+function handleNumber(value) {
+    // Prevent multiple decimals
+    if (value === '.' && currentInput.includes('.')) return;
+
+    // Prevent overflow
+    if (currentInput.length > 10) return;
+
+    currentInput += value;
+    updateDisplay(currentInput);
+}
+
+function handleOperator(operator) {
+    if (currentInput === '' && previousInput === '') return;
+
+    if (currentInput !== '') {
+        if (previousInput !== '') {
+            calculate();
+        } else {
+            previousInput = currentInput;
+        }
+    }
+
+    operatorMode = operator;
+    currentInput = '';
+}
+
+function calculate() {
+    if (currentInput === '' || previousInput === '') return;
+
+    const current = parseFloat(currentInput);
+    const previous = parseFloat(previousInput);
+    let result;
+
+    try {
+        switch (operatorMode) {
+            case '+':
+                result = previous + current;
+                break;
+            case '-': 
+                result = previous - current;
+                break;
+            case '*':
+                result = previous * current;
+                break;
+            case '/':
+                if (current === 0) throw new Error('Cannot divide by zero');
+                result = previous / current;
+                break;
+            default:
+                return;
+        }
+
+        // Handle float precision
+        result = Number(result.toFixed(8));
+
+        // Handle result overflow
+        if (!Number.isFinite(result)) {
+            throw new Error('Result too large');
+        }
+
+        updateDisplay(result);
+        previousInput = result.toString();
+        currentInput = '';
+    } catch (error) {
+        updateDisplay(error.message);
+    }
+}
+
+function backspace() {
     if (currentInput.length > 1) {
-        currentInput = currentInput.slice(0, currentInput.length - 1);
-        display.innerText = currentInput;
+        currentInput = currentInput.slice(-1);
+        updateDisplay(currentInput);
     } else {
-        // prevents backspace to nothing on screen - just defaults to zero
-        clearFunction();
-    };
+        reset();
+    }
 }
-
-// Event Listeners
-clearBtn.addEventListener('click', clearFunction);
-backSpaceBtn.addEventListener('click', backSpaceFunction);
-numberButtons.forEach(btn => {
-    btn.addEventListener('click', handleNumberButtonPress);
-});
-operatorButtons.forEach(btn => {
-    btn.addEventListener('click', handleOperatorButtonPress);
-});
-equalsBtn.addEventListener('click', calculateResult);
 
 // Event Listeners
 calculator.buttons.numbers.forEach(btn => {
@@ -122,7 +119,7 @@ calculator.buttons.numbers.forEach(btn => {
 calculator.buttons.operators.forEach(btn => {
     btn.addEventListener('click', (event) => {
         try {
-            handleOperatorButtonPress(event.target.value);
+            handleOperator(event.target.value);
         } catch (error) {
             console.error('Error handling operator');
             reset();
@@ -144,5 +141,9 @@ function handleKeyboardInput(event) {
         handleOperator(event.key);
     } else if (event.key === 'Enter') {
         calculate();
-    } else if (event.key === 'Backspace')
+    } else if (event.key === 'Backspace') {
+        backspace();
+    } else if (event.key === 'Escape') {
+        reset();
+    }
 }
