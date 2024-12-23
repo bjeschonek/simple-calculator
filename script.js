@@ -32,7 +32,7 @@ function handleNumber(value) {
     if (value === '.' && currentInput.includes('.')) return;
 
     // Prevent overflow
-    if (currentInput.length > 10) return;
+    if (currentInput.length >= 10) return;
 
     currentInput += value;
     updateDisplay(currentInput);
@@ -97,9 +97,10 @@ function calculate() {
 
 function backspace() {
     if (currentInput.length > 1) {
-        currentInput = currentInput.slice(-1);
+        currentInput = currentInput.slice(0, -1);
         updateDisplay(currentInput);
     } else {
+        // Prevents backspacing to empty display, just resets to zero
         reset();
     }
 }
